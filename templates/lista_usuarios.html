@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Usuarios{% endblock %}
+
+{% block content %}
+{% if messages %}
+<div class="mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+<div class="container mt-5">
+    <h1 class="text-center">Lista de Usuarios</h1>
+
+    {% if usuarios %}
+    <table id="usuariosTable" class="table table-striped table-hover mt-4">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Correo Electrónico</th>
+                <th>Rol</th>
+                <!-- <th>Contraseña</th> -->
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.id }}</td>
+                <td>{{ usuario.username }}</td>
+                <td>{{ usuario.email }}</td>
+                <td>{% if usuario.is_staff %}Administrador{% else %}Usuario{% endif %}</td>
+                <!-- <td>
+                    <div class="password-field">
+                        <input id="password-{{ usuario.id }}" type="password" value="{{ usuario.password }}" class="form-control" readonly>
+                        <button type="button" class="btn btn-light toggle-password" data-target="password-{{ usuario.id }}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </td> -->
+                <td>
+                    {% if permisos.puede_editar_usuario %}
+                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editUserModal-{{ usuario.id }}">Editar</button>
+                    {% endif %}
+                    {% if permisos.puede_eliminar_usuario %}
+                    <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    {% endif %}
+                    
+                </td>
+            </tr>
+
+            <!-- Modal para Editar Usuario -->
+            <div class="modal fade" id="editUserModal-{{ usuario.id }}" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel-{{ usuario.id }}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form method="POST" action="{% url 'editar_usuario' usuario.id %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editUserModalLabel-{{ usuario.id }}">Editar Usuario</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="username-{{ usuario.id }}">Nombre de Usuario</label>
+                                    <input type="text" id="username-{{ usuario.id }}" name="username" class="form-control" value="{{ usuario.username }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email-{{ usuario.id }}">Correo Electrónico</label>
+                                    <input type="email" id="email-{{ usuario.id }}" name="email" class="form-control" value="{{ usuario.email }}" required>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" id="is_staff-{{ usuario.id }}" name="is_staff" class="form-check-input" {% if usuario.is_staff %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_staff-{{ usuario.id }}">Administrador</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </tbody>
+        
+    </table>
+
+    
+    
+    {% else %}
+    <div class="alert alert-info text-center mt-4">No hay usuarios registrados.</div>
+    {% endif %}
+    {% if permisos.puede_crear_usuario %}
+    <div class="text-right mt-4">
+        <a href="{% url 'crear_usuario' %}" class="btn btn-success">Crear Nuevo Usuario</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
