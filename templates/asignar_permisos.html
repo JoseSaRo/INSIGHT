@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Asignar Permisos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Asignar Permisos a Usuarios</h2>
+
+    {% if messages %}
+    <div class="mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="get" class="form-inline justify-content-center my-4">
+        <label for="usuario" class="mr-2">Seleccionar Usuario:</label>
+        <select name="usuario" id="usuario" class="form-control mr-2" onchange="this.form.submit()">
+            <option value="">-- Selecciona un usuario --</option>
+            {% for u in usuarios %}
+            <option value="{{ u.id }}" {% if usuario_seleccionado.id == u.id %}selected{% endif %}>{{ u.username }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if usuario_seleccionado %}
+    <div class="row">
+        <!-- Permisos asignados -->
+        <div class="col-md-5">
+            <h5>Permisos asignados</h5>
+            <form method="get" class="form-permiso">
+                <input type="hidden" name="usuario" value="{{ usuario_seleccionado.id }}">
+                <input type="hidden" name="accion" value="remover">
+                <select name="permisos_asignados" class="form-control" size="8" multiple>
+                    {% for permiso in permisos_asignados %}
+                    <option value="{{ permiso.codename }}">{{ permiso.name }}</option>
+                    {% empty %}
+                    <option disabled>No hay permisos asignados</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-danger btn-block mt-2">Remover Permisos</button>
+            </form>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-center justify-content-center">
+            <i class="fas fa-exchange-alt fa-2x"></i>
+        </div>
+
+        <!-- Permisos disponibles -->
+        <div class="col-md-5">
+            <h5>Permisos disponibles</h5>
+            <form method="get" class="form-permiso">
+                <input type="hidden" name="usuario" value="{{ usuario_seleccionado.id }}">
+                <input type="hidden" name="accion" value="asignar">
+                <select name="permisos_disponibles" class="form-control" size="8" multiple>
+                    {% for permiso in permisos_disponibles %}
+                    <option value="{{ permiso.codename }}">{{ permiso.name }}</option>
+                    {% empty %}
+                    <option disabled>No hay más permisos disponibles</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-success btn-block mt-2">Asignar Permisos</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

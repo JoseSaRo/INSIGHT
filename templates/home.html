@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Administrador - Inicio{% endblock %}
+
+{% block content %}
+<div class="main-header">
+  <div class="main-header__intro-wrapper">
+    <div class="main-header__welcome">
+      <div class="main-header__welcome-title text-light">
+        Bienvenido, <strong>{{ usuario }}</strong>
+      </div>
+      <div class="main-header__welcome-subtitle text-light">
+        {{ today_date }}
+      </div>
+    </div>
+
+    <div class="quickview">
+      <div class="quickview__item">
+        <div class="quickview__item-total">41</div>
+        <div class="quickview__item-description">
+          <i class="far fa-calendar-alt"></i>
+          <span class="text-light">Eventos</span>
+        </div>
+      </div>
+      <div class="quickview__item">
+        <div class="quickview__item-total">64</div>
+        <div class="quickview__item-description">
+          <i class="far fa-comment"></i>
+          <span class="text-light">Notificaciones</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
