@@ -5,6 +5,7 @@ from django.contrib.auth.models import User, Permission
 from django.contrib import messages
 import datetime
 
+
 User = get_user_model()
 
 def login_view(request):
@@ -141,3 +142,12 @@ def asignar_permisos_view(request):
         'permisos_asignados': permisos_asignados,
         'permisos_disponibles': permisos_disponibles,
     })
+
+
+@login_required
+def powerbi_dashboard_view(request):
+    return render(request, 'bi_operaciones.html')
+
+@login_required
+def powerbi_financiero_view(request):
+    return render(request, 'bi_financiero.html')

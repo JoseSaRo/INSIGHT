@@ -4,7 +4,7 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CAIT{% endblock %}</title>
+    <title>{% block title %}INSIGHT{% endblock %}</title>
     <!-- Bootstrap CSS -->
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -32,7 +32,7 @@
 <body>
     <div class="grid">
         <header class="header">
-            <img src="{% static 'img/CAITfg.JPG' %}" alt="Logo CAIT" class="header__logo" width="100">
+            <img src="{% static 'img/INSIGHTgsinF.png' %}" alt="Logo INSIGHT" class="header__logo" width="100">
             <i class="fas fa-bars header__menu"></i>
             <div class="header__search">
                 <!-- <input class="header__input" placeholder="Search..." /> -->
@@ -90,6 +90,30 @@
                     </ul>
                 </li>
                 {% endif %}
+
+                <li class="navList__heading">INSIGHT</li>
+                <li>
+                    <div class="navList__subheading row row--align-v-center">
+                        <span class="navList__subheading-icon"><i class="fas fa-chart-line"></i></span>
+                        <span class="navList__subheading-title">Ejecutivos</span>
+                    </div>
+                    <ul class="subList subList--hidden">
+                        <li class="subList__item">
+                            <a href="{% url 'powerbi_financiero' %}">Financiero</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <div class="navList__subheading row row--align-v-center">
+                        <span class="navList__subheading-icon"><i class="fas fa-chart-line"></i></span>
+                        <span class="navList__subheading-title">Operaciones</span>
+                    </div>
+                    <ul class="subList subList--hidden">
+                        <li class="subList__item">
+                            <a href="{% url 'powerbi_dashboard' %}">Operaciones</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             
             <!-- Imagen centrada en el menú lateral -->
@@ -111,8 +135,8 @@
         <footer class="footer">
             
             <div class="footer__logos">
-                <p> CAIT Version 1 By </p>
-                <img src="{% static 'img/DESEMVERDE.png' %}" alt="Logo 2" class="footer__img">
+                <p> INSIGHT Version 1 By </p>
+                <img src="{% static 'img/INSIGHTwsinF.png' %}" alt="Logo 2" class="footer__img">
             </div>
         </footer>
     </div>

@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path
 from core import views
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.login_view, name='login'),
@@ -12,6 +14,9 @@ urlpatterns = [
     path('usuarios/eliminar/<int:pk>/', views.delete_user_view, name='eliminar_usuario'),
     path('permisos/asignar/', views.asignar_permisos_view, name='asignar_permisos'),  # 👈 agrega esta
     path('logout/', views.logout_view, name='logout'),
+    path('powerbi/', views.powerbi_dashboard_view, name='powerbi_dashboard'),
+    path('powerbi/financiero/', views.powerbi_financiero_view, name='powerbi_financiero'),
 
 ]
+
 
