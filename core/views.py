@@ -101,12 +101,18 @@ def asignar_permisos_view(request):
     usuarios = User.objects.all()
 
     codename_permisos = [
+        # gestión de usuarios (ya los tenías)
         "ver_menu_lista_usuarios",
         "ver_menu_crear_usuario",
         "ver_menu_asignar_permisos",
         "puede_crear_usuario",
         "puede_editar_usuario",
         "puede_eliminar_usuario",
+
+        # únicos por BI
+        "acceso_bi_financiero",
+        "acceso_bi_operaciones",
+        "acceso_bi_cait",
     ]
 
     permisos = Permission.objects.filter(codename__in=codename_permisos)
@@ -118,7 +124,8 @@ def asignar_permisos_view(request):
     usuario_id = request.GET.get('usuario')
     accion = request.GET.get('accion')
     permisos_seleccionados = request.GET.getlist(
-        'permisos_asignados' if accion == 'remover' else 'permisos_disponibles')
+        'permisos_asignados' if accion == 'remover' else 'permisos_disponibles'
+    )
 
     if usuario_id:
         usuario_seleccionado = User.objects.get(id=usuario_id)
@@ -134,7 +141,7 @@ def asignar_permisos_view(request):
 
     if usuario_seleccionado:
         permisos_asignados = usuario_seleccionado.user_permissions.filter(codename__in=codename_permisos)
-        permisos_disponibles = permisos.exclude(id__in=permisos_asignados)
+        permisos_disponibles = permisos.exclude(id__in=permisos_asignados.values('id'))
 
     return render(request, 'asignar_permisos.html', {
         'usuarios': usuarios,
@@ -144,10 +151,20 @@ def asignar_permisos_view(request):
     })
 
 
+
+from django.contrib.auth.decorators import login_required, permission_required
+
 @login_required
+@permission_required('core.acceso_bi_financiero', raise_exception=True)
+def powerbi_financiero_view(request):
+    return render(request, 'bi_financiero.html')
+
+@login_required
+@permission_required('core.acceso_bi_operaciones', raise_exception=True)
 def powerbi_dashboard_view(request):
     return render(request, 'bi_operaciones.html')
 
 @login_required
-def powerbi_financiero_view(request):
-    return render(request, 'bi_financiero.html')
+@permission_required('core.acceso_bi_cait', raise_exception=True)
+def powerbi_CAIT_view(request):
+    return render(request, 'bi_CAIT.html')
