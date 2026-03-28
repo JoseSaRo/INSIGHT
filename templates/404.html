@@ -1,0 +1,320 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruta no encontrada | INSIGHT</title>
+    <link rel="icon" type="image/png" href="{% static 'img/CorchetesV.png' %}">
+    <style>
+        :root {
+            --bg-a: #0b1f17;
+            --bg-b: #123f2c;
+            --card: rgba(255, 255, 255, 0.1);
+            --line: rgba(255, 255, 255, 0.16);
+            --text: #f4fbf6;
+            --muted: rgba(244, 251, 246, 0.75);
+            --accent: #8ce86a;
+            --accent-2: #d2ff6b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top left, rgba(140, 232, 106, 0.18), transparent 35%),
+                radial-gradient(circle at bottom right, rgba(210, 255, 107, 0.16), transparent 30%),
+                linear-gradient(135deg, var(--bg-a), var(--bg-b));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: hidden;
+        }
+
+        .scene {
+            width: min(960px, 100%);
+            position: relative;
+        }
+
+        .glow {
+            position: absolute;
+            inset: auto;
+            width: 220px;
+            height: 220px;
+            border-radius: 999px;
+            filter: blur(40px);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .glow--left {
+            top: -30px;
+            left: -40px;
+            background: var(--accent);
+        }
+
+        .glow--right {
+            right: 0;
+            bottom: -30px;
+            background: #38bdf8;
+        }
+
+        .panel {
+            position: relative;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 28px;
+            padding: 32px;
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: rgba(6, 18, 13, 0.72);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(10px);
+        }
+
+        .visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 320px;
+        }
+
+        .radar {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background:
+                radial-gradient(circle, rgba(140, 232, 106, 0.14) 0%, rgba(140, 232, 106, 0.03) 45%, transparent 70%),
+                rgba(255, 255, 255, 0.02);
+            overflow: hidden;
+        }
+
+        .radar::before,
+        .radar::after {
+            content: "";
+            position: absolute;
+            inset: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+        }
+
+        .radar::after {
+            inset: 52px;
+        }
+
+        .sweep {
+            position: absolute;
+            inset: -18%;
+            background: conic-gradient(from 0deg, transparent 0deg 300deg, rgba(140, 232, 106, 0.55) 335deg, rgba(210, 255, 107, 0.8) 360deg);
+            animation: spin 4s linear infinite;
+        }
+
+        .dot {
+            position: absolute;
+            top: 34px;
+            right: 44px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-2);
+            box-shadow: 0 0 18px rgba(210, 255, 107, 0.9);
+            animation: ping 1.8s ease-in-out infinite;
+        }
+
+        .logo-core {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-core img {
+            width: 74px;
+            height: 74px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.35));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-2);
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 36px;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        }
+
+        h1 {
+            margin: 16px 0 14px;
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            line-height: 1;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.65;
+            max-width: 560px;
+        }
+
+        .path {
+            margin-top: 18px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            color: #eafff2;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            appearance: none;
+            border: 0;
+            border-radius: 14px;
+            padding: 12px 18px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn--primary {
+            color: #0d2217;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: 0 10px 24px rgba(140, 232, 106, 0.22);
+        }
+
+        .btn--secondary {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .hint {
+            margin-top: 18px;
+            font-size: 0.92rem;
+            color: rgba(244, 251, 246, 0.65);
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes ping {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.35); opacity: 0.55; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @media (max-width: 860px) {
+            .panel {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .content {
+                align-items: center;
+            }
+
+            .actions {
+                justify-content: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .sweep,
+            .dot,
+            .logo-core img {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <div class="glow glow--left"></div>
+        <div class="glow glow--right"></div>
+
+        <section class="panel">
+            <div class="visual" aria-hidden="true">
+                <div class="radar">
+                    <div class="sweep"></div>
+                    <div class="dot"></div>
+                    <div class="logo-core">
+                        <img src="{% static 'img/CorchetesV.png' %}" alt="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="eyebrow">INSIGHT 404</div>
+                <h1>Esta ruta se perdio en el camino</h1>
+                <p>
+                    No encontramos la pagina que intentabas abrir. Puede que la direccion este mal escrita,
+                    que el enlace haya cambiado o que el contenido ya no exista.
+                </p>
+
+                <div class="path">{{ request_path }}</div>
+
+                <div class="actions">
+                    {% if request.user.is_authenticated %}
+                    <a class="btn btn--primary" href="{% url 'home' %}">Volver al inicio</a>
+                    {% else %}
+                    <a class="btn btn--primary" href="{% url 'login' %}">Ir al login</a>
+                    {% endif %}
+                    <a class="btn btn--secondary" href="javascript:history.back()">Regresar</a>
+                </div>
+
+                <div class="hint">
+                    Tip: revisa la URL y asegúrate de usar la ruta correcta.
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

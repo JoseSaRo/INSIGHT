@@ -18,4 +18,5 @@ class PermisoDummy(models.Model):
             ("acceso_bi_financiero", "Puede ver y acceder a BI Financiero"),
             ("acceso_bi_operaciones", "Puede ver y acceder a BI Operaciones"),
             ("acceso_bi_cait", "Puede ver y acceder a BI CAIT"),
+            ("acceso_bi_siniestralidad", "Puede ver y acceder a BI Siniestralidad"),
         ]

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}INSIGHT{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'img/CorchetesV.png' %}">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -12,6 +13,47 @@
     <!-- Estilos de Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <style>
+      .footer {
+        height: 40px;
+      }
+
+      .footer__img {
+        max-height: 32px;
+      }
+
+      .footer__logo-animate {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .footer__img--animated {
+        animation: footer-logo-float 2.8s ease-in-out infinite;
+        transform-origin: center;
+      }
+
+      @keyframes footer-logo-float {
+        0%, 100% {
+          transform: translateY(0) scale(1);
+        }
+        50% {
+          transform: translateY(-2px) scale(1.04);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .footer__img {
+          max-width: 110px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .footer__img--animated {
+          animation: none;
+        }
+      }
+    </style>
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -88,7 +130,7 @@
       {% endif %}
 
       {# Operaciones -> (Operaciones/CAIT) con un permiso por opción #}
-      {% if perms.core.acceso_bi_operaciones or perms.core.acceso_bi_cait %}
+      {% if perms.core.acceso_bi_operaciones or perms.core.acceso_bi_cait or perms.core.acceso_bi_siniestralidad %}
       <li>
         <div class="navList__subheading row row--align-v-center">
           <span class="navList__subheading-icon"><i class="fas fa-chart-line"></i></span>
@@ -100,6 +142,9 @@
           {% endif %}
           {% if perms.core.acceso_bi_cait %}
           <li class="subList__item"><a href="{% url 'powerbi_CAIT' %}">CAIT</a></li>
+          {% endif %}
+          {% if perms.core.acceso_bi_siniestralidad %}
+          <li class="subList__item"><a href="{% url 'powerbi_siniestralidad' %}">Siniestralidad</a></li>
           {% endif %}
           {# Deja los demás como visibles generales (o ponles permisos cuando los habilites) #}
           <!-- <li class="subList__item"><a href="{% url 'home' %}">Conservación</a></li>
@@ -114,7 +159,7 @@
 
     <!-- Imagen centrada en el menú lateral -->
     <div class="side__logo">
-      <img src="{% static 'img/ACCSA.jpg' %}" alt="Logo ACCSA">
+      <img src="{% static 'img/ACCSAfondoBlanco.png' %}" alt="Logo ACCSA">
     </div>
   </aside>
 
@@ -125,13 +170,154 @@
   <footer class="footer">
     <div class="footer__logos">
       <span>Version 1 By</span>
-      <img src="{% static 'img/INSIGHTwsinF.png' %}" alt="Logo 2" class="footer__img">
+      <span class="footer__logo-animate" aria-label="Logo DESEM">
+        <img src="{% static 'img/DESEMVERDE.png' %}" alt="Logo DESEM" class="footer__img footer__img--animated">
+      </span>
     </div>
   </footer>
+</div>
+
+<div class="modal fade" id="sessionTimeoutModal" tabindex="-1" role="dialog" aria-labelledby="sessionTimeoutTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title" id="sessionTimeoutTitle">Sesión por expirar</h5>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2">
+          Detectamos inactividad en la página.
+        </p>
+        <p class="mb-0">
+          Tu sesión se cerrará automáticamente en
+          <strong id="session-timeout-countdown">30</strong>
+          segundos si no confirmas que sigues aquí.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="session-continue-btn" class="btn btn-success">Seguir en sesión</button>
+        <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Cerrar sesión ahora</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Lightbox2 JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
 <script src="{% static 'js/admin.js' %}"></script>
+<script>
+  (function () {
+    const INACTIVITY_LIMIT_MS = 5 * 60 * 1000;
+    const WARNING_BEFORE_MS = 30 * 1000;
+    const ACTIVITY_THROTTLE_MS = 1000;
+    const logoutUrl = "{% url 'logout' %}";
+    const modalId = '#sessionTimeoutModal';
+    const countdownEl = document.getElementById('session-timeout-countdown');
+    const continueBtn = document.getElementById('session-continue-btn');
+
+    let lastActivityAt = Date.now();
+    let lastTrackedAt = 0;
+    let hasLoggedOut = false;
+    let warningVisible = false;
+    let countdownIntervalId = null;
+
+    function markActivity() {
+      if (hasLoggedOut) {
+        return;
+      }
+
+      const now = Date.now();
+      if (now - lastTrackedAt < ACTIVITY_THROTTLE_MS) {
+        return;
+      }
+
+      lastTrackedAt = now;
+      lastActivityAt = now;
+      hideWarning();
+    }
+
+    function getRemainingMs() {
+      return INACTIVITY_LIMIT_MS - (Date.now() - lastActivityAt);
+    }
+
+    function updateCountdown() {
+      const remainingMs = getRemainingMs();
+      const remainingSeconds = Math.max(0, Math.ceil(remainingMs / 1000));
+      countdownEl.textContent = remainingSeconds;
+    }
+
+    function showWarning() {
+      if (warningVisible || hasLoggedOut) {
+        updateCountdown();
+        return;
+      }
+
+      warningVisible = true;
+      updateCountdown();
+      $(modalId).modal('show');
+
+      countdownIntervalId = window.setInterval(function () {
+        updateCountdown();
+      }, 1000);
+    }
+
+    function hideWarning() {
+      if (!warningVisible) {
+        return;
+      }
+
+      warningVisible = false;
+
+      if (countdownIntervalId) {
+        window.clearInterval(countdownIntervalId);
+        countdownIntervalId = null;
+      }
+
+      $(modalId).modal('hide');
+    }
+
+    function logoutIfInactive() {
+      if (hasLoggedOut) {
+        return;
+      }
+
+      const remainingMs = getRemainingMs();
+
+      if (remainingMs <= 0) {
+        hasLoggedOut = true;
+        hideWarning();
+        window.location.assign(logoutUrl);
+        return;
+      }
+
+      if (remainingMs <= WARNING_BEFORE_MS) {
+        showWarning();
+      }
+    }
+
+    [
+      'click',
+      'mousemove',
+      'mousedown',
+      'keydown',
+      'scroll',
+      'touchstart',
+      'pointerdown',
+      'pointermove',
+    ].forEach(function (eventName) {
+      window.addEventListener(eventName, markActivity, { passive: true });
+    });
+
+    document.addEventListener('visibilitychange', logoutIfInactive);
+    window.addEventListener('focus', logoutIfInactive);
+
+    continueBtn.addEventListener('click', function () {
+      lastTrackedAt = 0;
+      markActivity();
+    });
+
+    markActivity();
+    window.setInterval(logoutIfInactive, 1000);
+  })();
+</script>
 </body>
 </html>

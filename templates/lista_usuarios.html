@@ -21,8 +21,7 @@
                     <th>ID</th>
                     <th>Usuario</th>
                     <th>Correo Electrónico</th>
-                    <th>Rol</th>
-                    <!-- <th>Contraseña</th> -->
+                    <th>Admin Django</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -32,15 +31,7 @@
                     <td>{{ usuario.id }}</td>
                     <td>{{ usuario.username }}</td>
                     <td>{{ usuario.email }}</td>
-                    <td>{% if usuario.is_staff %}Administrador{% else %}Usuario{% endif %}</td>
-                    <!-- <td>
-                        <div class="password-field">
-                            <input id="password-{{ usuario.id }}" type="password" value="{{ usuario.password }}" class="form-control" readonly>
-                            <button type="button" class="btn btn-light toggle-password" data-target="password-{{ usuario.id }}">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </td> -->
+                    <td>{% if usuario.is_staff %}Sí{% else %}No{% endif %}</td>
                     <td>
                         {% if permisos.puede_editar_usuario %}
                         <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editUserModal-{{ usuario.id }}">Editar</button>
@@ -48,11 +39,9 @@
                         {% if permisos.puede_eliminar_usuario %}
                         <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm">Eliminar</a>
                         {% endif %}
-                        
                     </td>
                 </tr>
-    
-                <!-- Modal para Editar Usuario -->
+
                 <div class="modal fade" id="editUserModal-{{ usuario.id }}" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel-{{ usuario.id }}" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -75,7 +64,7 @@
                                     </div>
                                     <div class="form-check">
                                         <input type="checkbox" id="is_staff-{{ usuario.id }}" name="is_staff" class="form-check-input" {% if usuario.is_staff %}checked{% endif %}>
-                                        <label class="form-check-label" for="is_staff-{{ usuario.id }}">Administrador</label>
+                                        <label class="form-check-label" for="is_staff-{{ usuario.id }}">Permitir acceso al admin de Django</label>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -86,17 +75,15 @@
                         </div>
                     </div>
                 </div>
-    
+
                 {% endfor %}
             </tbody>
-            
         </table>
     </div>
-    
-    
     {% else %}
     <div class="alert alert-info text-center mt-4">No hay usuarios registrados.</div>
     {% endif %}
+
     {% if permisos.puede_crear_usuario %}
     <div class="text-right mt-4">
         <a href="{% url 'crear_usuario' %}" class="btn btn-success">Crear Nuevo Usuario</a>

@@ -25,43 +25,123 @@
     </form>
 
     {% if usuario_seleccionado %}
+    <div class="alert alert-light border mb-4">
+        <strong>{{ usuario_seleccionado.username }}</strong>:
+        marca uno o varios permisos dentro de cada categoria para asignarlos o removerlos.
+    </div>
+
     <div class="row">
-        <!-- Permisos asignados -->
-        <div class="col-md-5">
-            <h5>Permisos asignados</h5>
-            <form method="get" class="form-permiso">
-                <input type="hidden" name="usuario" value="{{ usuario_seleccionado.id }}">
-                <input type="hidden" name="accion" value="remover">
-                <select name="permisos_asignados" class="form-control" size="8" multiple>
-                    {% for permiso in permisos_asignados %}
-                    <option value="{{ permiso.codename }}">{{ permiso.name }}</option>
-                    {% empty %}
-                    <option disabled>No hay permisos asignados</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn btn-danger btn-block mt-2">Remover Permisos</button>
-            </form>
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-danger text-white">
+                    Permisos asignados
+                </div>
+                <div class="card-body">
+                    <form method="post" class="form-permiso h-100 d-flex flex-column">
+                        {% csrf_token %}
+                        <input type="hidden" name="usuario" value="{{ usuario_seleccionado.id }}">
+                        <input type="hidden" name="accion" value="remover">
+
+                        {% if permisos_asignados_agrupados %}
+                        <div class="mb-3 text-muted small">
+                            Selecciona los permisos que quieras quitar.
+                        </div>
+
+                        {% for categoria in permisos_asignados_agrupados %}
+                        <div class="border rounded p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="font-weight-bold">{{ categoria.label }}</div>
+                                    <small class="text-muted">{{ categoria.description }}</small>
+                                </div>
+                                <span class="badge badge-danger">{{ categoria.permissions|length }}</span>
+                            </div>
+
+                            {% for permiso in categoria.permissions %}
+                            <div class="custom-control custom-checkbox mb-2">
+                                <input
+                                    class="custom-control-input"
+                                    type="checkbox"
+                                    id="asignado-{{ permiso.codename }}"
+                                    name="permisos_asignados"
+                                    value="{{ permiso.codename }}">
+                                <label class="custom-control-label" for="asignado-{{ permiso.codename }}">
+                                    {{ permiso.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-danger btn-block mt-auto">Remover Permisos</button>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">
+                            Este usuario todavia no tiene permisos asignados.
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <div class="col-md-2 d-flex align-items-center justify-content-center">
-            <i class="fas fa-exchange-alt fa-2x"></i>
+        <div class="col-lg-2 d-flex align-items-center justify-content-center mb-4">
+            <div class="text-center text-muted">
+                <i class="fas fa-exchange-alt fa-2x mb-2"></i>
+                <div class="small">Mover permisos</div>
+            </div>
         </div>
 
-        <!-- Permisos disponibles -->
-        <div class="col-md-5">
-            <h5>Permisos disponibles</h5>
-            <form method="get" class="form-permiso">
-                <input type="hidden" name="usuario" value="{{ usuario_seleccionado.id }}">
-                <input type="hidden" name="accion" value="asignar">
-                <select name="permisos_disponibles" class="form-control" size="8" multiple>
-                    {% for permiso in permisos_disponibles %}
-                    <option value="{{ permiso.codename }}">{{ permiso.name }}</option>
-                    {% empty %}
-                    <option disabled>No hay más permisos disponibles</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn btn-success btn-block mt-2">Asignar Permisos</button>
-            </form>
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    Permisos disponibles
+                </div>
+                <div class="card-body">
+                    <form method="post" class="form-permiso h-100 d-flex flex-column">
+                        {% csrf_token %}
+                        <input type="hidden" name="usuario" value="{{ usuario_seleccionado.id }}">
+                        <input type="hidden" name="accion" value="asignar">
+
+                        {% if permisos_disponibles_agrupados %}
+                        <div class="mb-3 text-muted small">
+                            Selecciona los permisos que quieras agregar.
+                        </div>
+
+                        {% for categoria in permisos_disponibles_agrupados %}
+                        <div class="border rounded p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <div class="font-weight-bold">{{ categoria.label }}</div>
+                                    <small class="text-muted">{{ categoria.description }}</small>
+                                </div>
+                                <span class="badge badge-success">{{ categoria.permissions|length }}</span>
+                            </div>
+
+                            {% for permiso in categoria.permissions %}
+                            <div class="custom-control custom-checkbox mb-2">
+                                <input
+                                    class="custom-control-input"
+                                    type="checkbox"
+                                    id="disponible-{{ permiso.codename }}"
+                                    name="permisos_disponibles"
+                                    value="{{ permiso.codename }}">
+                                <label class="custom-control-label" for="disponible-{{ permiso.codename }}">
+                                    {{ permiso.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-success btn-block mt-auto">Asignar Permisos</button>
+                        {% else %}
+                        <div class="alert alert-secondary mb-0">
+                            No hay mas permisos disponibles para este usuario.
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
     {% endif %}

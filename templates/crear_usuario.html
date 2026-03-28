@@ -30,6 +30,12 @@
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
 
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="is_staff" name="is_staff">
+            <label class="form-check-label" for="is_staff">Permitir acceso al admin de Django</label>
+            <small class="form-text text-muted">Actívalo solo si este usuario también debe entrar a <code>/admin/</code>.</small>
+        </div>
+
         <button type="submit" class="btn btn-success">Crear Usuario</button>
         <a href="{% url 'lista_usuarios' %}" class="btn btn-secondary ml-2">Cancelar</a>
     </form>

@@ -17,6 +17,7 @@ urlpatterns = [
     path('powerbi/', views.powerbi_dashboard_view, name='powerbi_dashboard'),
     path('powerbi/financiero/', views.powerbi_financiero_view, name='powerbi_financiero'),
     path('powerbi/cait/', views.powerbi_CAIT_view, name='powerbi_CAIT'),
+    path('powerbi/siniestralidad/', views.powerbi_siniestralidad_view, name='powerbi_siniestralidad'),
 
     # ==========================
     #  Rutas para reset password
@@ -54,3 +55,5 @@ urlpatterns = [
         name='password_reset_complete'
     ),
 ]
+
+handler404 = 'core.views.custom_404_view'
